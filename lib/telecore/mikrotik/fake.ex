@@ -23,7 +23,8 @@ defmodule Telecore.Mikrotik.Fake do
   def create_secret(%Router{id: id}, attrs), do: call({:create, id, :secrets, attrs})
 
   @impl true
-  def update_secret(%Router{id: id}, name, attrs), do: call({:update, id, :secrets, "name", name, attrs})
+  def update_secret(%Router{id: id}, name, attrs),
+    do: call({:update, id, :secrets, "name", name, attrs})
 
   @impl true
   def delete_secret(%Router{id: id}, name), do: call({:delete, id, :secrets, "name", name})
@@ -48,7 +49,8 @@ defmodule Telecore.Mikrotik.Fake do
   def create_queue(%Router{id: id}, attrs), do: call({:create, id, :queues, attrs})
 
   @impl true
-  def update_queue(%Router{id: id}, name, attrs), do: call({:update, id, :queues, "name", name, attrs})
+  def update_queue(%Router{id: id}, name, attrs),
+    do: call({:update, id, :queues, "name", name, attrs})
 
   @impl true
   def delete_queue(%Router{id: id}, name), do: call({:delete, id, :queues, "name", name})
@@ -147,27 +149,89 @@ defmodule Telecore.Mikrotik.Fake do
     if Map.has_key?(state, router_id) do
       state
     else
-      Map.put(state, router_id, seed())
+      Map.put(state, router_id, seed(router_id))
     end
   end
 
-  defp seed do
-    %{
-      secrets: [
-        %{".id" => "*1", "name" => "joao", "password" => "pwjoao", "profile" => "10mbps", "service" => "pppoe", "disabled" => "false", "comment" => "Cliente residencial"},
-        %{".id" => "*2", "name" => "maria", "password" => "pwmaria", "profile" => "50mbps", "service" => "pppoe", "disabled" => "false", "comment" => ""},
-        %{".id" => "*3", "name" => "pedro", "password" => "pwpedro", "profile" => "100mbps", "service" => "pppoe", "disabled" => "false", "comment" => "Empresa"}
-      ],
-      sessions: [
-        %{".id" => "*A1", "name" => "joao", "address" => "10.0.0.5", "uptime" => "2h13m", "service" => "pppoe", "caller-id" => "aa:bb:cc:dd:ee:01"},
-        %{".id" => "*A2", "name" => "maria", "address" => "10.0.0.6", "uptime" => "47m", "service" => "pppoe", "caller-id" => "aa:bb:cc:dd:ee:02"}
-      ],
-      queues: [
-        %{".id" => "*Q1", "name" => "joao", "target" => "10.0.0.5/32", "max-limit" => "10M/10M"},
-        %{".id" => "*Q2", "name" => "maria", "target" => "10.0.0.6/32", "max-limit" => "50M/50M"},
-        %{".id" => "*Q3", "name" => "pedro", "target" => "10.0.0.7/32", "max-limit" => "100M/100M"}
+  # Deterministic per-router variation. Each router gets the same 3 secrets,
+  # but with different disabled flags and active sessions, so the UI shows
+  # visibly different state across routers without manual setup.
+  defp seed(router_id) do
+    disabled_names =
+      case :erlang.phash2(router_id, 4) do
+        0 -> []
+        1 -> ["joao"]
+        2 -> ["joao", "maria"]
+        3 -> ["pedro"]
+      end
+
+    secrets =
+      [
+        %{
+          ".id" => "*1",
+          "name" => "joao",
+          "password" => "pwjoao",
+          "profile" => "10mbps",
+          "service" => "pppoe",
+          "comment" => "Cliente residencial"
+        },
+        %{
+          ".id" => "*2",
+          "name" => "maria",
+          "password" => "pwmaria",
+          "profile" => "50mbps",
+          "service" => "pppoe",
+          "comment" => ""
+        },
+        %{
+          ".id" => "*3",
+          "name" => "pedro",
+          "password" => "pwpedro",
+          "profile" => "100mbps",
+          "service" => "pppoe",
+          "comment" => "Empresa"
+        }
       ]
-    }
+      |> Enum.map(fn s ->
+        Map.put(s, "disabled", if(s["name"] in disabled_names, do: "true", else: "false"))
+      end)
+
+    all_sessions = [
+      %{
+        ".id" => "*A1",
+        "name" => "joao",
+        "address" => "10.0.0.5",
+        "uptime" => "2h13m",
+        "service" => "pppoe",
+        "caller-id" => "aa:bb:cc:dd:ee:01"
+      },
+      %{
+        ".id" => "*A2",
+        "name" => "maria",
+        "address" => "10.0.0.6",
+        "uptime" => "47m",
+        "service" => "pppoe",
+        "caller-id" => "aa:bb:cc:dd:ee:02"
+      },
+      %{
+        ".id" => "*A3",
+        "name" => "pedro",
+        "address" => "10.0.0.7",
+        "uptime" => "5d 2h",
+        "service" => "pppoe",
+        "caller-id" => "aa:bb:cc:dd:ee:03"
+      }
+    ]
+
+    sessions = Enum.reject(all_sessions, &(&1["name"] in disabled_names))
+
+    queues = [
+      %{".id" => "*Q1", "name" => "joao", "target" => "10.0.0.5/32", "max-limit" => "10M/10M"},
+      %{".id" => "*Q2", "name" => "maria", "target" => "10.0.0.6/32", "max-limit" => "50M/50M"},
+      %{".id" => "*Q3", "name" => "pedro", "target" => "10.0.0.7/32", "max-limit" => "100M/100M"}
+    ]
+
+    %{secrets: secrets, sessions: sessions, queues: queues}
   end
 
   defp not_found(value), do: %Error{code: :not_found, message: "#{value} not found"}

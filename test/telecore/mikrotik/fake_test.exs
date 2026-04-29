@@ -17,13 +17,23 @@ defmodule Telecore.Mikrotik.FakeTest do
   }
 
   describe "seed" do
-    test "first call seeds 3 secrets, 2 sessions, 3 queues" do
+    test "first call seeds 3 secrets and 3 queues; sessions vary by router id" do
       assert {:ok, secrets} = Fake.list_secrets(@router)
       assert length(secrets) == 3
+      assert Enum.all?(secrets, &(&1["disabled"] in ["true", "false"]))
+
       assert {:ok, sessions} = Fake.list_sessions(@router)
-      assert length(sessions) == 2
+      # Sessions are derived from secrets that aren't disabled; varies 1..3 across routers.
+      assert length(sessions) in 1..3
+
       assert {:ok, queues} = Fake.list_queues(@router)
       assert length(queues) == 3
+    end
+
+    test "seed is deterministic for the same router id" do
+      {:ok, sessions_a} = Fake.list_sessions(@router)
+      {:ok, sessions_b} = Fake.list_sessions(@router)
+      assert sessions_a == sessions_b
     end
   end
 
