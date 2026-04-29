@@ -70,6 +70,26 @@ defmodule TelecoreWeb.Auth do
     end
   end
 
+  @doc """
+  LiveView on_mount hook. Loads `current_user` from session and redirects to `/login`
+  when not authenticated.
+  """
+  def on_mount(:ensure_authenticated, _params, session, socket) do
+    user =
+      case session["user_id"] do
+        nil -> nil
+        id -> Telecore.Repo.get(Telecore.Accounts.User, id)
+      end
+
+    case user do
+      %Telecore.Accounts.User{} ->
+        {:cont, Phoenix.Component.assign(socket, :current_user, user)}
+
+      _ ->
+        {:halt, Phoenix.LiveView.redirect(socket, to: "/login")}
+    end
+  end
+
   defp safe_get_user(id) do
     Accounts.get_user!(id)
   rescue
