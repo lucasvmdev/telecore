@@ -12,7 +12,10 @@ defmodule Telecore.Mikrotik.HTTP do
 
   @impl true
   def get_secret(%Router{} = router, name) do
-    case router |> base_req() |> Req.get(url: "/rest/ppp/secret", params: [name: name]) |> handle_response() do
+    case router
+         |> base_req()
+         |> Req.get(url: "/rest/ppp/secret", params: [name: name])
+         |> handle_response() do
       {:ok, [secret | _]} -> {:ok, secret}
       {:ok, []} -> {:error, %Error{code: :not_found, message: "secret #{name} not found"}}
       error -> error
@@ -27,7 +30,10 @@ defmodule Telecore.Mikrotik.HTTP do
   @impl true
   def update_secret(%Router{} = router, name, attrs) do
     with {:ok, id} <- find_id(router, "/rest/ppp/secret", name) do
-      router |> base_req() |> Req.patch(url: "/rest/ppp/secret/#{id}", json: attrs) |> handle_response()
+      router
+      |> base_req()
+      |> Req.patch(url: "/rest/ppp/secret/#{id}", json: attrs)
+      |> handle_response()
     end
   end
 
@@ -67,7 +73,10 @@ defmodule Telecore.Mikrotik.HTTP do
 
   @impl true
   def disconnect_session(%Router{} = router, session_id) do
-    router |> base_req() |> Req.delete(url: "/rest/ppp/active/#{session_id}") |> handle_response(:ok)
+    router
+    |> base_req()
+    |> Req.delete(url: "/rest/ppp/active/#{session_id}")
+    |> handle_response(:ok)
   end
 
   # --- Simple Queues ---
@@ -85,7 +94,10 @@ defmodule Telecore.Mikrotik.HTTP do
   @impl true
   def update_queue(%Router{} = router, name, attrs) do
     with {:ok, id} <- find_id(router, "/rest/queue/simple", name) do
-      router |> base_req() |> Req.patch(url: "/rest/queue/simple/#{id}", json: attrs) |> handle_response()
+      router
+      |> base_req()
+      |> Req.patch(url: "/rest/queue/simple/#{id}", json: attrs)
+      |> handle_response()
     end
   end
 

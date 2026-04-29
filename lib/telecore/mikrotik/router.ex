@@ -6,8 +6,8 @@ defmodule Telecore.Mikrotik.Router do
   @foreign_key_type :binary_id
 
   schema "mikrotik_routers" do
-    field :label,    :string
-    field :url,      :string
+    field :label, :string
+    field :url, :string
     field :username, :string
     field :password, Telecore.Encrypted.Binary
 

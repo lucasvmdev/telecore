@@ -62,9 +62,9 @@ config :phoenix, :json_library, Jason
 
 config :telecore, Telecore.Vault,
   ciphers: [
-    default: {Cloak.Ciphers.AES.GCM,
-     tag: "AES.GCM.V1",
-     key: Base.decode64!("w0jbBnQIxuobbZGz5ZdeSoXM2KwP/lMxl7bkLcfXJBQ=")}
+    default:
+      {Cloak.Ciphers.AES.GCM,
+       tag: "AES.GCM.V1", key: Base.decode64!("w0jbBnQIxuobbZGz5ZdeSoXM2KwP/lMxl7bkLcfXJBQ=")}
   ]
 
 # Import environment specific config. This must remain at the bottom

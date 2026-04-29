@@ -20,7 +20,9 @@ defmodule Telecore.Mikrotik.RouterTest do
 
     test "requires all fields" do
       changeset = Router.changeset(%Router{}, %{})
-      assert %{label: [_ | _], url: [_ | _], username: [_ | _], password: [_ | _]} = errors_on(changeset)
+
+      assert %{label: [_ | _], url: [_ | _], username: [_ | _], password: [_ | _]} =
+               errors_on(changeset)
     end
 
     test "validates url format" do
@@ -59,7 +61,12 @@ defmodule Telecore.Mikrotik.RouterTest do
     test "encrypts password at rest" do
       {:ok, router} = Mikrotik.create_router(@valid_attrs)
       raw_id = Ecto.UUID.dump!(router.id)
-      raw = Telecore.Repo.one(from r in "mikrotik_routers", where: r.id == ^raw_id, select: r.password)
+
+      raw =
+        Telecore.Repo.one(
+          from r in "mikrotik_routers", where: r.id == ^raw_id, select: r.password
+        )
+
       assert raw != "supersecret"
       assert Mikrotik.get_router!(router.id).password == "supersecret"
     end
@@ -73,7 +80,9 @@ defmodule Telecore.Mikrotik.RouterTest do
   describe "update_router/2" do
     test "updates the router" do
       router = insert(:mikrotik_router)
-      assert {:ok, %Router{label: "UPDATED"}} = Mikrotik.update_router(router, %{label: "UPDATED"})
+
+      assert {:ok, %Router{label: "UPDATED"}} =
+               Mikrotik.update_router(router, %{label: "UPDATED"})
     end
   end
 

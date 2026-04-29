@@ -1,12 +1,12 @@
 <Layouts.flash_group flash={@flash} />
-
 <div class="min-h-screen flex items-center justify-center px-4 py-12">
   <div class="w-full max-w-sm space-y-6">
     <div class="text-center">
       <h1 class="text-2xl font-semibold">Sign in</h1>
+      
       <p class="text-sm text-base-content/70 mt-1">Telecore</p>
     </div>
-
+    
     <.form for={%{}} action={~p"/login"} class="space-y-4">
       <div>
         <label for="email" class="label label-text">Email</label>
@@ -19,7 +19,7 @@
           class="input input-bordered w-full"
         />
       </div>
-
+      
       <div>
         <label for="password" class="label label-text">Password</label>
         <input
@@ -31,8 +31,7 @@
           class="input input-bordered w-full"
         />
       </div>
-
-      <button type="submit" class="btn btn-primary w-full">Sign in</button>
+       <button type="submit" class="btn btn-primary w-full">Sign in</button>
     </.form>
   </div>
 </div>

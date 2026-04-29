@@ -62,9 +62,7 @@ if config_env() == :prod do
 
   config :telecore, Telecore.Vault,
     ciphers: [
-      default: {Cloak.Ciphers.AES.GCM,
-       tag: "AES.GCM.V1",
-       key: Base.decode64!(cloak_key)}
+      default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: Base.decode64!(cloak_key)}
     ]
 
   host = System.get_env("PHX_HOST") || "example.com"

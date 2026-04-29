@@ -68,7 +68,9 @@ defmodule Telecore.MikrotikTest do
     test "delegates to adapter" do
       router = @router
 
-      expect(Telecore.Mikrotik.Mock, :update_secret, fn ^router, "joao", %{"profile" => "50mbps"} ->
+      expect(Telecore.Mikrotik.Mock, :update_secret, fn ^router,
+                                                        "joao",
+                                                        %{"profile" => "50mbps"} ->
         {:ok, %{"name" => "joao", "profile" => "50mbps"}}
       end)
 
@@ -164,7 +166,9 @@ defmodule Telecore.MikrotikTest do
     test "delegates to adapter" do
       router = @router
 
-      expect(Telecore.Mikrotik.Mock, :update_queue, fn ^router, "joao", %{"max-limit" => "50M/50M"} ->
+      expect(Telecore.Mikrotik.Mock, :update_queue, fn ^router,
+                                                       "joao",
+                                                       %{"max-limit" => "50M/50M"} ->
         {:ok, %{"name" => "joao", "max-limit" => "50M/50M"}}
       end)
 
