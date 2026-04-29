@@ -91,7 +91,7 @@ defmodule TelecoreWeb.SecretLive.Index do
       <.header>
         Clientes (PPPoE secrets)
         <:actions>
-          <.link patch={~p"/routers/#{@router.id}/secrets/new"} class="btn btn-primary btn-sm">
+          <.link patch={~p"/routers/#{@router.id}/secrets/new"} class="btn btn-aurora btn-sm">
             Novo cliente
           </.link>
         </:actions>

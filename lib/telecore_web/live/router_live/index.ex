@@ -45,7 +45,7 @@ defmodule TelecoreWeb.RouterLive.Index do
       <.header>
         Roteadores
         <:actions>
-          <.link patch={~p"/routers/new"} class="btn btn-primary btn-sm">Novo Roteador</.link>
+          <.link patch={~p"/routers/new"} class="btn btn-aurora btn-sm">Novo Roteador</.link>
         </:actions>
       </.header>
 
