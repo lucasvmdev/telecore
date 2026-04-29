@@ -35,11 +35,7 @@
           ~r"/_build/",
           ~r"/deps/",
           ~r"/node_modules/",
-          # phx.gen.auth-generated files — kept verbatim so future regeneration
-          # is friction-free. Lint our own code instead.
-          ~r"lib/telecore/accounts\.ex$",
-          ~r"lib/telecore/accounts/user_notifier\.ex$",
-          ~r"lib/telecore_web/user_auth\.ex$",
+          # Phoenix-generated boilerplate — lint our own code, not the framework's.
           ~r"lib/telecore_web/components/core_components\.ex$",
           ~r"test/support/data_case\.ex$",
           ~r"test/support/conn_case\.ex$"
