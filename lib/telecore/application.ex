@@ -8,6 +8,7 @@ defmodule Telecore.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      Telecore.Vault,
       TelecoreWeb.Telemetry,
       Telecore.Repo,
       {DNSCluster, query: Application.get_env(:telecore, :dns_cluster_query) || :ignore},

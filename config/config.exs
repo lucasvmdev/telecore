@@ -60,6 +60,13 @@ config :logger, :default_formatter,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+config :telecore, Telecore.Vault,
+  ciphers: [
+    default: {Cloak.Ciphers.AES.GCM,
+     tag: "AES.GCM.V1",
+     key: Base.decode64!("w0jbBnQIxuobbZGz5ZdeSoXM2KwP/lMxl7bkLcfXJBQ=")}
+  ]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
