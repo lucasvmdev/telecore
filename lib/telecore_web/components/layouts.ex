@@ -31,28 +31,32 @@ defmodule TelecoreWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <header class="navbar bg-base-200 px-4 sm:px-6 lg:px-8 border-b border-base-300">
-      <div class="flex-1">
-        <a href={~p"/routers"} class="text-lg font-semibold">Telecore</a>
-      </div>
-      <nav class="flex-none">
-        <ul class="flex items-center gap-2">
-          <li><.link navigate={~p"/routers"} class="btn btn-ghost btn-sm">Roteadores</.link></li>
-          <li :if={@current_user}>
-            <span class="text-sm opacity-60 px-2">{@current_user.email}</span>
-          </li>
-          <li :if={@current_user}>
-            <.link href={~p"/logout"} method="delete" class="btn btn-ghost btn-sm">Sair</.link>
-          </li>
-          <li><.theme_toggle /></li>
-        </ul>
-      </nav>
-    </header>
+    <div class="aurora-bg min-h-screen flex flex-col">
+      <header class="glass-header navbar px-4 sm:px-6 lg:px-8">
+        <div class="flex-1">
+          <a href={~p"/routers"} class="text-lg font-semibold tracking-tight">Telecore</a>
+        </div>
+        <nav class="flex-none">
+          <ul class="flex items-center gap-2">
+            <li>
+              <.link navigate={~p"/routers"} class="btn btn-ghost btn-sm">Roteadores</.link>
+            </li>
+            <li :if={@current_user} class="hidden sm:list-item">
+              <span class="text-sm text-base-content/70 px-2">{@current_user.email}</span>
+            </li>
+            <li :if={@current_user}>
+              <.link href={~p"/logout"} method="delete" class="btn btn-ghost btn-sm">Sair</.link>
+            </li>
+            <li><.theme_toggle /></li>
+          </ul>
+        </nav>
+      </header>
 
-    <main class="px-4 py-6 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-6xl space-y-4">{render_slot(@inner_block)}</div>
-    </main>
-    <.flash_group flash={@flash} />
+      <main class="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+        <div class="mx-auto w-full max-w-6xl space-y-4">{render_slot(@inner_block)}</div>
+      </main>
+      <.flash_group flash={@flash} />
+    </div>
     """
   end
 
