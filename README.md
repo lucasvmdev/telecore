@@ -1,14 +1,14 @@
 # Telecore
 
 Aplicação [Phoenix](https://www.phoenixframework.org/) 1.8 em Elixir, servindo
-como base para produtos web e APIs JSON. Já vem com autenticação de usuários
-(LiveView + API com Bearer token), Postgres via Ecto, build de assets com
-Tailwind/esbuild e ferramental de qualidade pré-configurado.
+como base para produtos web. Inclui login simples por email/senha (cookie
+session), Postgres via Ecto, build de assets com Tailwind/esbuild e ferramental
+de qualidade pré-configurado.
 
 ## Stack
 
-- **Elixir** `~> 1.15` + **Phoenix** `~> 1.8.5`
-- **Phoenix LiveView** `~> 1.1`
+- **Elixir** `~> 1.18` + **Phoenix** `~> 1.8.5`
+- **Phoenix LiveView** `~> 1.1` (disponível, ainda não usado pelas páginas atuais)
 - **Ecto / Postgrex** sobre **PostgreSQL**
 - **Bandit** como servidor HTTP
 - **Tailwind** + **esbuild** para os assets
@@ -19,7 +19,7 @@ Tailwind/esbuild e ferramental de qualidade pré-configurado.
 
 ## Pré-requisitos
 
-- Elixir 1.15+ e Erlang/OTP compatível
+- Elixir 1.18+ e Erlang/OTP compatível
 - PostgreSQL rodando localmente (em `localhost`, usuário `postgres`/`postgres`
   por padrão — ver [config/dev.exs](config/dev.exs))
 
@@ -32,6 +32,13 @@ mix setup
 Esse alias instala dependências, cria o banco, roda migrations, executa seeds
 e prepara os assets. Detalhes em [mix.exs](mix.exs#L89-L104).
 
+O seed cria um usuário admin a partir de variáveis de ambiente, com fallback
+para credenciais de dev (`admin@telecore.dev` / `changeme123`):
+
+```bash
+SEED_ADMIN_EMAIL=you@example.com SEED_ADMIN_PASSWORD=...secret... mix run priv/repo/seeds.exs
+```
+
 ## Subindo o servidor
 
 ```bash
@@ -40,9 +47,10 @@ mix phx.server
 iex -S mix phx.server
 ```
 
-Acesse [http://localhost:4000](http://localhost:4000).
+Acesse [http://localhost:4000](http://localhost:4000) — você será redirecionado
+para `/login` se não estiver autenticado.
 
-Em ambiente de desenvolvimento, ficam disponíveis:
+Em ambiente de desenvolvimento, ficam disponíveis sem auth:
 
 - `/dev/dashboard` — [LiveDashboard](https://hexdocs.pm/phoenix_live_dashboard)
 - `/dev/mailbox` — preview de e-mails enviados via Swoosh
@@ -59,53 +67,32 @@ mix dialyzer
 O alias `precommit` ([mix.exs:102](mix.exs#L102)) também remove deps não
 utilizadas — rode antes de abrir um PR.
 
-## Rotas principais
+## Rotas
 
 Definidas em [lib/telecore_web/router.ex](lib/telecore_web/router.ex).
 
-### Web (LiveView)
+| Método   | Rota      | Descrição                                                |
+| -------- | --------- | -------------------------------------------------------- |
+| `GET`    | `/login`  | Formulário de login                                      |
+| `POST`   | `/login`  | Autentica email + senha; redireciona pra `/`             |
+| `DELETE` | `/logout` | Encerra a sessão; redireciona pra `/login`               |
+| `GET`    | `/`       | Página da aplicação (autenticada — redireciona se não)   |
 
-| Rota                         | Descrição                       |
-| ---------------------------- | ------------------------------- |
-| `GET /`                      | Página inicial                  |
-| `GET /users/register`        | Cadastro                        |
-| `GET /users/log-in`          | Login                           |
-| `GET /users/settings`        | Configurações (autenticado)     |
-
-### API JSON (`/api/v1`)
-
-Pública:
-
-| Método | Rota         | Descrição                                          |
-| ------ | ------------ | -------------------------------------------------- |
-| `POST` | `/sessions`  | Login → retorna `{ token, user }`                  |
-| `POST` | `/users`     | Cadastro → retorna `{ token, user }`               |
-
-Autenticada via `Authorization: Bearer <token>`:
-
-| Método   | Rota          | Descrição                              |
-| -------- | ------------- | -------------------------------------- |
-| `GET`    | `/users/me`   | Usuário atual                          |
-| `DELETE` | `/sessions`   | Revoga o token usado na requisição     |
-
-A autenticação da API é feita pelo plug
-[`TelecoreWeb.Plugs.ApiAuth`](lib/telecore_web/plugs/api_auth.ex), que devolve
-`401 {"error":"unauthorized"}` quando o Bearer está ausente ou inválido.
-
-Formato de erro:
-
-- `{"error": "<código>"}` — falhas não relacionadas a campos (400/401)
-- `{"errors": {"<campo>": ["<msg>"]}}` — validação de changeset (422)
+Sem registro público, sem reset de senha, sem API JSON (a versão atual). Adição
+de novos usuários é feita por seed ou via console (`Telecore.Accounts.create_user/1`).
 
 ## Estrutura
 
 ```
 lib/
-├── telecore/              # contextos de domínio (Accounts, Repo, Mailer, ...)
-└── telecore_web/          # camada web
-    ├── controllers/api/v1 # endpoints JSON
-    ├── live/user_live     # LiveViews de auth
-    ├── plugs/api_auth.ex  # autenticação Bearer
+├── telecore/
+│   ├── accounts.ex         # contexto: get_user_*/create_user
+│   └── accounts/user.ex    # schema + changesets
+└── telecore_web/
+    ├── auth.ex             # plugs e helpers de sessão (cookie)
+    ├── controllers/
+    │   ├── session_controller.ex
+    │   └── session_html/new.html.heex
     └── router.ex
 ```
 
@@ -124,6 +111,9 @@ Em produção, as seguintes variáveis de ambiente são lidas em
 | `POOL_SIZE`         | não         | tamanho do pool do Ecto (default `10`)             |
 | `ECTO_IPV6`         | não         | `true`/`1` para habilitar IPv6 no banco            |
 | `DNS_CLUSTER_QUERY` | não         | query DNS usada pelo DNSCluster                    |
+
+Para o seed do admin em produção, defina também `SEED_ADMIN_EMAIL` e
+`SEED_ADMIN_PASSWORD` antes de rodar `mix run priv/repo/seeds.exs`.
 
 Veja também o
 [guia oficial de deploy do Phoenix](https://hexdocs.pm/phoenix/deployment.html).
