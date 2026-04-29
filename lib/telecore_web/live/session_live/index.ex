@@ -51,34 +51,42 @@ defmodule TelecoreWeb.SessionLive.Index do
     ~H"""
     <Layouts.app flash={@flash} current_user={@current_user}>
       <.router_nav router={@router} active={:sessions} />
-
       <.header>
         Sessões ativas
         <:subtitle>Atualizando a cada 5 segundos</:subtitle>
       </.header>
-
-      <div :if={@last_error} class="alert alert-error">
-        <span>Erro: {@last_error.message}</span>
-      </div>
-
+      
+      <div :if={@last_error} class="alert alert-error"><span>Erro: {@last_error.message}</span></div>
+      
       <table class="table">
         <thead>
           <tr>
             <th>Nome</th>
+            
             <th>IP</th>
+            
             <th>Service</th>
+            
             <th>Uptime</th>
+            
             <th>Caller-ID</th>
+            
             <th class="text-right">Ações</th>
           </tr>
         </thead>
+        
         <tbody id="sessions">
           <tr :for={s <- @sessions} id={"session-#{s[".id"]}"}>
             <td>{s["name"]}</td>
+            
             <td><code>{s["address"]}</code></td>
+            
             <td>{s["service"]}</td>
+            
             <td>{s["uptime"]}</td>
+            
             <td><code class="text-xs">{s["caller-id"]}</code></td>
+            
             <td class="text-right">
               <.link
                 phx-click={JS.push("disconnect", value: %{id: s[".id"]})}
@@ -91,7 +99,7 @@ defmodule TelecoreWeb.SessionLive.Index do
           </tr>
         </tbody>
       </table>
-
+      
       <p :if={@sessions == [] and is_nil(@last_error)} class="text-center opacity-60 py-12">
         Nenhuma sessão ativa neste roteador.
       </p>

@@ -177,7 +177,11 @@ defmodule TelecoreWeb.CoreComponents do
       data-cancel={JS.exec(@on_cancel, "phx-remove")}
       class="relative z-50 hidden"
     >
-      <div id={"#{@id}-bg"} class="bg-base-300/90 fixed inset-0 transition-opacity" aria-hidden="true" />
+      <div
+        id={"#{@id}-bg"}
+        class="bg-base-300/90 fixed inset-0 transition-opacity"
+        aria-hidden="true"
+      />
       <div
         class="fixed inset-0 overflow-y-auto"
         aria-labelledby={"#{@id}-title"}
@@ -205,9 +209,8 @@ defmodule TelecoreWeb.CoreComponents do
                   <.icon name="hero-x-mark" class="size-5" />
                 </button>
               </div>
-              <div id={"#{@id}-content"}>
-                {render_slot(@inner_block)}
-              </div>
+              
+              <div id={"#{@id}-content"}>{render_slot(@inner_block)}</div>
             </.focus_wrap>
           </div>
         </div>
@@ -629,10 +632,9 @@ defmodule TelecoreWeb.CoreComponents do
     <div class="space-y-2">
       <div class="text-sm opacity-60">
         <.link navigate={~p"/routers"} class="hover:underline">Roteadores</.link>
-        <span class="mx-1">›</span>
-        <span class="font-medium">{@router.label}</span>
+        <span class="mx-1">›</span> <span class="font-medium">{@router.label}</span>
       </div>
-
+      
       <div role="tablist" class="tabs tabs-bordered">
         <.link
           navigate={~p"/routers/#{@router.id}"}

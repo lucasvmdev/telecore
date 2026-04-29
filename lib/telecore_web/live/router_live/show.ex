@@ -36,33 +36,45 @@ defmodule TelecoreWeb.RouterLive.Show do
     ~H"""
     <Layouts.app flash={@flash} current_user={@current_user}>
       <.router_nav router={@router} active={:show} />
-
       <.header>
         {@router.label}
         <:subtitle>{@router.url}</:subtitle>
+        
         <:actions>
           <.link patch={~p"/routers/#{@router.id}/edit"} class="btn btn-ghost btn-sm">Editar</.link>
         </:actions>
       </.header>
-
+      
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <.link navigate={~p"/routers/#{@router.id}/sessions"} class="card bg-base-200 p-4 hover:bg-base-300">
+        <.link
+          navigate={~p"/routers/#{@router.id}/sessions"}
+          class="card bg-base-200 p-4 hover:bg-base-300"
+        >
           <div class="text-3xl font-bold">{@counts.sessions}</div>
+          
           <div class="text-sm opacity-60">Sessões ativas</div>
         </.link>
-
-        <.link navigate={~p"/routers/#{@router.id}/secrets"} class="card bg-base-200 p-4 hover:bg-base-300">
+        <.link
+          navigate={~p"/routers/#{@router.id}/secrets"}
+          class="card bg-base-200 p-4 hover:bg-base-300"
+        >
           <div class="text-3xl font-bold">{@counts.secrets}</div>
+          
           <div class="text-sm opacity-60">Clientes</div>
         </.link>
-
         <div class="card bg-base-200 p-4">
           <div class="text-3xl font-bold">{@counts.queues}</div>
+          
           <div class="text-sm opacity-60">Queues</div>
         </div>
       </div>
-
-      <.modal :if={@live_action == :edit} id="router-modal" show on_cancel={JS.patch(~p"/routers/#{@router.id}")}>
+      
+      <.modal
+        :if={@live_action == :edit}
+        id="router-modal"
+        show
+        on_cancel={JS.patch(~p"/routers/#{@router.id}")}
+      >
         <.live_component
           module={TelecoreWeb.RouterLive.FormComponent}
           id={@router.id}

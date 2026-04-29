@@ -42,7 +42,9 @@ defmodule TelecoreWeb.SecretLive.FormComponent do
     case Mikrotik.create_secret(socket.assigns.router, attrs) do
       {:ok, _} ->
         notify_parent(:saved)
-        {:noreply, socket |> put_flash(:info, "Cliente criado.") |> push_patch(to: socket.assigns.patch)}
+
+        {:noreply,
+         socket |> put_flash(:info, "Cliente criado.") |> push_patch(to: socket.assigns.patch)}
 
       {:error, %{message: m}} ->
         {:noreply, put_flash(socket, :error, "Falha: #{m}")}
@@ -53,7 +55,9 @@ defmodule TelecoreWeb.SecretLive.FormComponent do
     case Mikrotik.update_secret(socket.assigns.router, socket.assigns.secret_name, attrs) do
       {:ok, _} ->
         notify_parent(:saved)
-        {:noreply, socket |> put_flash(:info, "Cliente atualizado.") |> push_patch(to: socket.assigns.patch)}
+
+        {:noreply,
+         socket |> put_flash(:info, "Cliente atualizado.") |> push_patch(to: socket.assigns.patch)}
 
       {:error, %{message: m}} ->
         {:noreply, put_flash(socket, :error, "Falha: #{m}")}
@@ -69,7 +73,7 @@ defmodule TelecoreWeb.SecretLive.FormComponent do
     ~H"""
     <div>
       <.header>{@title}</.header>
-
+      
       <.simple_form
         for={@form}
         id="secret-form"
@@ -82,10 +86,7 @@ defmodule TelecoreWeb.SecretLive.FormComponent do
         <.input field={@form[:profile]} type="text" label="Profile (ex.: 10mbps)" />
         <.input field={@form[:service]} type="text" label="Service" />
         <.input field={@form[:comment]} type="text" label="Observação" />
-
-        <:actions>
-          <.button phx-disable-with="Salvando..." type="submit">Salvar</.button>
-        </:actions>
+        <:actions><.button phx-disable-with="Salvando..." type="submit">Salvar</.button></:actions>
       </.simple_form>
     </div>
     """

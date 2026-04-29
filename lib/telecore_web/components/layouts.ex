@@ -36,26 +36,28 @@ defmodule TelecoreWeb.Layouts do
         <div class="flex-1">
           <a href={~p"/routers"} class="text-lg font-semibold tracking-tight">Telecore</a>
         </div>
+        
         <nav class="flex-none">
           <ul class="flex items-center gap-2">
-            <li>
-              <.link navigate={~p"/routers"} class="btn btn-ghost btn-sm">Roteadores</.link>
-            </li>
+            <li><.link navigate={~p"/routers"} class="btn btn-ghost btn-sm">Roteadores</.link></li>
+            
             <li :if={@current_user} class="hidden sm:list-item">
               <span class="text-sm text-base-content/70 px-2">{@current_user.email}</span>
             </li>
+            
             <li :if={@current_user}>
               <.link href={~p"/logout"} method="delete" class="btn btn-ghost btn-sm">Sair</.link>
             </li>
+            
             <li><.theme_toggle /></li>
           </ul>
         </nav>
       </header>
-
+      
       <main class="flex-1 px-4 py-6 sm:px-6 lg:px-8">
         <div class="mx-auto w-full max-w-6xl space-y-4">{render_slot(@inner_block)}</div>
       </main>
-      <.flash_group flash={@flash} />
+       <.flash_group flash={@flash} />
     </div>
     """
   end

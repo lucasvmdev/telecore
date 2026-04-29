@@ -23,7 +23,9 @@ defmodule Telecore.Mikrotik.SecretForm do
     form
     |> cast(attrs, @cast)
     |> validate_required(@required)
-    |> validate_format(:name, ~r/^[a-zA-Z0-9._-]+$/, message: "must be alphanumeric (._- allowed)")
+    |> validate_format(:name, ~r/^[a-zA-Z0-9._-]+$/,
+      message: "must be alphanumeric (._- allowed)"
+    )
   end
 
   def to_attrs(%__MODULE__{} = f) do

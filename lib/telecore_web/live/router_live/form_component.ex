@@ -89,10 +89,8 @@ defmodule TelecoreWeb.RouterLive.FormComponent do
   def render(assigns) do
     ~H"""
     <div>
-      <.header>
-        {@title}
-      </.header>
-
+      <.header>{@title}</.header>
+      
       <.simple_form
         for={@form}
         id="router-form"
@@ -104,21 +102,20 @@ defmodule TelecoreWeb.RouterLive.FormComponent do
         <.input field={@form[:url]} type="text" label="URL (https://...)" />
         <.input field={@form[:username]} type="text" label="Usuário" />
         <.input field={@form[:password]} type="password" label="Senha" />
-
         <div :if={@test_status}>
           <div :if={match?({:ok, _}, @test_status)} class="alert alert-success">
             {elem(@test_status, 1)}
           </div>
+          
           <div :if={match?({:error, _}, @test_status)} class="alert alert-error">
             {elem(@test_status, 1)}
           </div>
         </div>
-
+        
         <:actions>
           <.button phx-target={@myself} phx-click="test_connection" type="button" class="btn-ghost">
             Testar conexão
-          </.button>
-          <.button phx-disable-with="Salvando..." type="submit">Salvar</.button>
+          </.button> <.button phx-disable-with="Salvando..." type="submit">Salvar</.button>
         </:actions>
       </.simple_form>
     </div>

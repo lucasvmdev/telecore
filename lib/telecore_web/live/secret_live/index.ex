@@ -63,8 +63,11 @@ defmodule TelecoreWeb.SecretLive.Index do
 
   def handle_event("toggle", %{"name" => name, "disabled" => "false"}, socket) do
     case Mikrotik.disable_secret(socket.assigns.router, name) do
-      {:ok, _} -> {:noreply, socket |> put_flash(:info, "#{name} desabilitado.") |> load_secrets()}
-      {:error, %{message: m}} -> {:noreply, put_flash(socket, :error, m)}
+      {:ok, _} ->
+        {:noreply, socket |> put_flash(:info, "#{name} desabilitado.") |> load_secrets()}
+
+      {:error, %{message: m}} ->
+        {:noreply, put_flash(socket, :error, m)}
     end
   end
 
@@ -87,7 +90,6 @@ defmodule TelecoreWeb.SecretLive.Index do
     ~H"""
     <Layouts.app flash={@flash} current_user={@current_user}>
       <.router_nav router={@router} active={:secrets} />
-
       <.header>
         Clientes (PPPoE secrets)
         <:actions>
@@ -96,36 +98,45 @@ defmodule TelecoreWeb.SecretLive.Index do
           </.link>
         </:actions>
       </.header>
-
-      <div :if={@last_error} class="alert alert-error">
-        <span>Erro: {@last_error.message}</span>
-      </div>
-
+      
+      <div :if={@last_error} class="alert alert-error"><span>Erro: {@last_error.message}</span></div>
+      
       <table class="table">
         <thead>
           <tr>
             <th>Nome</th>
+            
             <th>Profile</th>
+            
             <th>Service</th>
+            
             <th>Status</th>
+            
             <th class="text-right">Ações</th>
           </tr>
         </thead>
+        
         <tbody id="secrets">
           <tr :for={s <- @secrets} id={"secret-#{s["name"]}"}>
             <td>{s["name"]}</td>
+            
             <td>{s["profile"]}</td>
+            
             <td>{s["service"]}</td>
+            
             <td>
               <span :if={s["disabled"] == "true"} class="badge badge-ghost">Desabilitado</span>
               <span :if={s["disabled"] != "true"} class="badge badge-success">Habilitado</span>
             </td>
+            
             <td class="text-right space-x-2">
               <.link patch={~p"/routers/#{@router.id}/secrets/#{s["name"]}/edit"} class="link">
                 Editar
               </.link>
               <.link
-                phx-click={JS.push("toggle", value: %{name: s["name"], disabled: s["disabled"] || "false"})}
+                phx-click={
+                  JS.push("toggle", value: %{name: s["name"], disabled: s["disabled"] || "false"})
+                }
                 class="link"
               >
                 {if s["disabled"] == "true", do: "Habilitar", else: "Desabilitar"}
@@ -141,11 +152,11 @@ defmodule TelecoreWeb.SecretLive.Index do
           </tr>
         </tbody>
       </table>
-
+      
       <p :if={@secrets == [] and is_nil(@last_error)} class="text-center opacity-60 py-12">
         Nenhum cliente cadastrado neste roteador.
       </p>
-
+      
       <.modal
         :if={@live_action in [:new, :edit]}
         id="secret-modal"

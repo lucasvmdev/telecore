@@ -35,7 +35,9 @@ defmodule TelecoreWeb.RouterLive.Index do
   def handle_event("delete", %{"id" => id}, socket) do
     router = Mikrotik.get_router!(id)
     {:ok, _} = Mikrotik.delete_router(router)
-    {:noreply, socket |> put_flash(:info, "Roteador excluído.") |> assign(:routers, Mikrotik.list_routers())}
+
+    {:noreply,
+     socket |> put_flash(:info, "Roteador excluído.") |> assign(:routers, Mikrotik.list_routers())}
   end
 
   @impl true
@@ -48,21 +50,28 @@ defmodule TelecoreWeb.RouterLive.Index do
           <.link patch={~p"/routers/new"} class="btn btn-aurora btn-sm">Novo Roteador</.link>
         </:actions>
       </.header>
-
+      
       <table class="table">
         <thead>
           <tr>
             <th>Label</th>
+            
             <th>URL</th>
+            
             <th>Usuário</th>
+            
             <th class="text-right">Ações</th>
           </tr>
         </thead>
+        
         <tbody id="routers">
           <tr :for={router <- @routers} id={"router-#{router.id}"}>
             <td>{router.label}</td>
+            
             <td>{router.url}</td>
+            
             <td>{router.username}</td>
+            
             <td class="text-right space-x-2">
               <.link navigate={~p"/routers/#{router.id}"} class="link">Ver</.link>
               <.link navigate={~p"/routers/#{router.id}/edit"} class="link">Editar</.link>
@@ -77,11 +86,11 @@ defmodule TelecoreWeb.RouterLive.Index do
           </tr>
         </tbody>
       </table>
-
+      
       <p :if={@routers == []} class="text-center opacity-60 py-12">
         Nenhum roteador cadastrado. <.link patch={~p"/routers/new"} class="link">Criar o primeiro</.link>.
       </p>
-
+      
       <.modal :if={@live_action == :new} id="router-modal" show on_cancel={JS.patch(~p"/routers")}>
         <.live_component
           module={TelecoreWeb.RouterLive.FormComponent}

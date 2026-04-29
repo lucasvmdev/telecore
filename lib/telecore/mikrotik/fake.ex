@@ -195,7 +195,11 @@ defmodule Telecore.Mikrotik.Fake do
       names
       |> Enum.with_index()
       |> Enum.map(fn {name, i} ->
-        {profile, _} = Enum.at(@profiles, rem(:erlang.phash2({id, name}, length(@profiles)), length(@profiles)))
+        {profile, _} =
+          Enum.at(
+            @profiles,
+            rem(:erlang.phash2({id, name}, length(@profiles)), length(@profiles))
+          )
 
         %{
           ".id" => "*S#{i + 1}",
@@ -217,7 +221,11 @@ defmodule Telecore.Mikrotik.Fake do
           ".id" => "*A#{i + 1}",
           "name" => s["name"],
           "address" => "#{subnet}.#{10 + i}",
-          "uptime" => Enum.at(@uptimes, rem(:erlang.phash2({id, s["name"]}, length(@uptimes)), length(@uptimes))),
+          "uptime" =>
+            Enum.at(
+              @uptimes,
+              rem(:erlang.phash2({id, s["name"]}, length(@uptimes)), length(@uptimes))
+            ),
           "service" => "pppoe",
           "caller-id" => mac_for(id, i)
         }

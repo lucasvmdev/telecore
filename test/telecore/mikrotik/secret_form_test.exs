@@ -26,7 +26,14 @@ defmodule Telecore.Mikrotik.SecretFormTest do
 
   describe "to_attrs/1" do
     test "produces string-keyed map" do
-      form = %SecretForm{name: "joao", password: "pw", profile: "10mbps", service: "pppoe", comment: nil}
+      form = %SecretForm{
+        name: "joao",
+        password: "pw",
+        profile: "10mbps",
+        service: "pppoe",
+        comment: nil
+      }
+
       assert SecretForm.to_attrs(form) == %{
                "name" => "joao",
                "password" => "pw",
@@ -39,14 +46,24 @@ defmodule Telecore.Mikrotik.SecretFormTest do
 
   describe "from_secret/1" do
     test "loads a secret map into struct" do
-      secret = %{"name" => "joao", "password" => "pw", "profile" => "10mbps", "service" => "pppoe", "comment" => "x"}
-      assert %SecretForm{name: "joao", profile: "10mbps", comment: "x"} = SecretForm.from_secret(secret)
+      secret = %{
+        "name" => "joao",
+        "password" => "pw",
+        "profile" => "10mbps",
+        "service" => "pppoe",
+        "comment" => "x"
+      }
+
+      assert %SecretForm{name: "joao", profile: "10mbps", comment: "x"} =
+               SecretForm.from_secret(secret)
     end
   end
 
   defp errors_on(changeset) do
     Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
-      Regex.replace(~r"%{(\w+)}", msg, fn _, key -> opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string() end)
+      Regex.replace(~r"%{(\w+)}", msg, fn _, key ->
+        opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
+      end)
     end)
   end
 end
