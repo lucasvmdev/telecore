@@ -25,6 +25,17 @@ defmodule TelecoreWeb.Router do
 
     get "/", PageController, :home
     delete "/logout", SessionController, :delete
+
+    live_session :authenticated, on_mount: {TelecoreWeb.Auth, :ensure_authenticated} do
+      live "/routers", RouterLive.Index, :index
+      live "/routers/new", RouterLive.Index, :new
+      live "/routers/:id", RouterLive.Show, :show
+      live "/routers/:id/edit", RouterLive.Show, :edit
+      live "/routers/:id/sessions", SessionLive.Index, :index
+      live "/routers/:id/secrets", SecretLive.Index, :index
+      live "/routers/:id/secrets/new", SecretLive.Index, :new
+      live "/routers/:id/secrets/:name/edit", SecretLive.Index, :edit
+    end
   end
 
   if Application.compile_env(:telecore, :dev_routes) do
