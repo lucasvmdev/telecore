@@ -116,18 +116,16 @@
       radial-gradient(60% 80% at 100% 100%,
         color-mix(in oklch, var(--color-accent) 10%, transparent),
         transparent 60%);
-  }
 
-  /* Stronger gradients in dark theme via the @custom-variant `dark`
-     declared earlier in this file. */
-  .aurora-bg:where([data-theme=dark], [data-theme=dark] *) {
-    background-image:
-      radial-gradient(60% 80% at 0% 0%,
-        color-mix(in oklch, var(--color-primary) 35%, transparent),
-        transparent 60%),
-      radial-gradient(60% 80% at 100% 100%,
-        color-mix(in oklch, var(--color-accent) 30%, transparent),
-        transparent 60%);
+    @variant dark {
+      background-image:
+        radial-gradient(60% 80% at 0% 0%,
+          color-mix(in oklch, var(--color-primary) 35%, transparent),
+          transparent 60%),
+        radial-gradient(60% 80% at 100% 100%,
+          color-mix(in oklch, var(--color-accent) 30%, transparent),
+          transparent 60%);
+    }
   }
 
   .glass-card {
@@ -137,12 +135,12 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     box-shadow: 0 1px 2px 0 color-mix(in oklch, var(--color-base-content) 6%, transparent);
-  }
 
-  .glass-card:where([data-theme=dark], [data-theme=dark] *) {
-    background-color: color-mix(in oklch, var(--color-base-100) 40%, transparent);
-    border-color: color-mix(in oklch, var(--color-base-content) 12%, transparent);
-    box-shadow: 0 1px 2px 0 color-mix(in oklch, #000 30%, transparent);
+    @variant dark {
+      background-color: color-mix(in oklch, var(--color-base-100) 40%, transparent);
+      border-color: color-mix(in oklch, var(--color-base-content) 12%, transparent);
+      box-shadow: 0 1px 2px 0 color-mix(in oklch, oklch(0% 0 0) 30%, transparent);
+    }
   }
 
   .glass-header {
@@ -153,17 +151,22 @@
     border-bottom: 1px solid color-mix(in oklch, var(--color-base-content) 8%, transparent);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-  }
 
-  .glass-header:where([data-theme=dark], [data-theme=dark] *) {
-    background-color: color-mix(in oklch, var(--color-base-100) 50%, transparent);
-    border-bottom-color: color-mix(in oklch, var(--color-base-content) 10%, transparent);
+    @variant dark {
+      background-color: color-mix(in oklch, var(--color-base-100) 50%, transparent);
+      border-bottom-color: color-mix(in oklch, var(--color-base-content) 10%, transparent);
+    }
   }
 
   .btn-aurora {
-    background-image: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    background-color: var(--color-primary);
     color: var(--color-primary-content);
     border: 0;
+
+    @variant dark {
+      background-color: transparent;
+      background-image: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    }
   }
 
   .btn-aurora:hover {
