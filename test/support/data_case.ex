@@ -24,6 +24,7 @@ defmodule Telecore.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import Telecore.DataCase
+      import Telecore.Factory
     end
   end
 

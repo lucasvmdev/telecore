@@ -5,6 +5,7 @@ defmodule Telecore.Factory do
   use ExMachina.Ecto, repo: Telecore.Repo
 
   alias Telecore.Accounts.User
+  alias Telecore.Mikrotik.Router
 
   @valid_password "passw0rd-test"
 
@@ -20,4 +21,13 @@ defmodule Telecore.Factory do
   Use this to authenticate factory-built users in controller tests.
   """
   def valid_password, do: @valid_password
+
+  def mikrotik_router_factory do
+    %Router{
+      label: sequence(:label, &"POP-#{&1}"),
+      url: "https://192.168.1.1",
+      username: "admin",
+      password: "supersecret"
+    }
+  end
 end
