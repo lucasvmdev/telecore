@@ -9,12 +9,9 @@ defmodule TelecoreWeb.PageControllerTest do
   describe "when authenticated" do
     setup :register_and_log_in_user
 
-    test "GET / renders the welcome page with the user's email", %{conn: conn, user: user} do
+    test "GET / redirects to /routers", %{conn: conn} do
       conn = get(conn, ~p"/")
-      response = html_response(conn, 200)
-      assert response =~ "Welcome"
-      assert response =~ user.email
-      assert response =~ "Sign out"
+      assert redirected_to(conn) == ~p"/routers"
     end
   end
 end
