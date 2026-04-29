@@ -7,22 +7,25 @@ defmodule Telecore.Application do
 
   @impl true
   def start(_type, _args) do
-    children = [
-      Telecore.Vault,
-      TelecoreWeb.Telemetry,
-      Telecore.Repo,
-      {DNSCluster, query: Application.get_env(:telecore, :dns_cluster_query) || :ignore},
-      {Phoenix.PubSub, name: Telecore.PubSub},
-      # Start a worker by calling: Telecore.Worker.start_link(arg)
-      # {Telecore.Worker, arg},
-      # Start to serve requests, typically the last entry
-      TelecoreWeb.Endpoint
-    ]
+    children =
+      [
+        Telecore.Vault,
+        TelecoreWeb.Telemetry,
+        Telecore.Repo,
+        {DNSCluster, query: Application.get_env(:telecore, :dns_cluster_query) || :ignore},
+        {Phoenix.PubSub, name: Telecore.PubSub}
+      ] ++ fake_mikrotik() ++ [TelecoreWeb.Endpoint]
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Telecore.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  defp fake_mikrotik do
+    if Application.get_env(:telecore, :mikrotik_adapter) == Telecore.Mikrotik.Fake do
+      [Telecore.Mikrotik.Fake]
+    else
+      []
+    end
   end
 
   # Tell Phoenix to update the endpoint configuration
