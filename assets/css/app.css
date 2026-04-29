@@ -103,3 +103,75 @@
 [data-phx-session], [data-phx-teleported-src] { display: contents }
 
 /* This file is for your main application CSS */
+
+/* Aurora glass — login + home modernization (2026-04-29).
+   All values reference CSS variables already defined above. */
+@layer components {
+  .aurora-bg {
+    background-color: var(--color-base-100);
+    background-image:
+      radial-gradient(60% 80% at 0% 0%,
+        color-mix(in oklch, var(--color-primary) 12%, transparent),
+        transparent 60%),
+      radial-gradient(60% 80% at 100% 100%,
+        color-mix(in oklch, var(--color-accent) 10%, transparent),
+        transparent 60%);
+  }
+
+  /* Stronger gradients in dark theme via the @custom-variant `dark`
+     declared earlier in this file. */
+  .aurora-bg:where([data-theme=dark], [data-theme=dark] *) {
+    background-image:
+      radial-gradient(60% 80% at 0% 0%,
+        color-mix(in oklch, var(--color-primary) 35%, transparent),
+        transparent 60%),
+      radial-gradient(60% 80% at 100% 100%,
+        color-mix(in oklch, var(--color-accent) 30%, transparent),
+        transparent 60%);
+  }
+
+  .glass-card {
+    background-color: color-mix(in oklch, var(--color-base-100) 80%, transparent);
+    border: 1px solid var(--color-base-300);
+    border-radius: 12px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 1px 2px 0 color-mix(in oklch, var(--color-base-content) 6%, transparent);
+  }
+
+  .glass-card:where([data-theme=dark], [data-theme=dark] *) {
+    background-color: color-mix(in oklch, var(--color-base-100) 40%, transparent);
+    border-color: color-mix(in oklch, var(--color-base-content) 12%, transparent);
+    box-shadow: 0 1px 2px 0 color-mix(in oklch, #000 30%, transparent);
+  }
+
+  .glass-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: color-mix(in oklch, var(--color-base-100) 70%, transparent);
+    border-bottom: 1px solid color-mix(in oklch, var(--color-base-content) 8%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .glass-header:where([data-theme=dark], [data-theme=dark] *) {
+    background-color: color-mix(in oklch, var(--color-base-100) 50%, transparent);
+    border-bottom-color: color-mix(in oklch, var(--color-base-content) 10%, transparent);
+  }
+
+  .btn-aurora {
+    background-image: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    color: var(--color-primary-content);
+    border: 0;
+  }
+
+  .btn-aurora:hover {
+    filter: brightness(1.05);
+  }
+
+  .btn-aurora:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
