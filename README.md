@@ -110,7 +110,9 @@ Em produção, as seguintes variáveis de ambiente são lidas em
 | `PHX_SERVER`        | não         | `true` para iniciar o endpoint a partir do release |
 | `POOL_SIZE`         | não         | tamanho do pool do Ecto (default `10`)             |
 | `ECTO_IPV6`         | não         | `true`/`1` para habilitar IPv6 no banco            |
-| `DNS_CLUSTER_QUERY` | não         | query DNS usada pelo DNSCluster                    |
+| `DNS_CLUSTER_QUERY`      | não         | query DNS usada pelo DNSCluster                                                                               |
+| `CLOAK_KEY`              | sim         | chave AES-256 em Base64 para criptografar credenciais de roteadores; gere com `:crypto.strong_rand_bytes(32) \| Base.encode64()` |
+| `MIKROTIK_TLS_INSECURE`  | não         | defina como `"true"` para desabilitar verificação de certificado TLS (use apenas em dev/staging com certs autoassinados) |
 
 Para o seed do admin em produção, defina também `SEED_ADMIN_EMAIL` e
 `SEED_ADMIN_PASSWORD` antes de rodar `mix run priv/repo/seeds.exs`.

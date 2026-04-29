@@ -60,6 +60,8 @@ config :logger, :default_formatter,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Dev/test encryption key — safe to commit; never used in production.
+# Production reads CLOAK_KEY from the environment (see config/runtime.exs).
 config :telecore, Telecore.Vault,
   ciphers: [
     default:

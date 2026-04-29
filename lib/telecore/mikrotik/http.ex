@@ -112,11 +112,11 @@ defmodule Telecore.Mikrotik.HTTP do
 
   defp base_req(%Router{url: url, username: username, password: password}) do
     tls_verify =
-      if System.get_env("MIKROTIK_TLS_VERIFY") == "false", do: :verify_none, else: :verify_peer
+      if System.get_env("MIKROTIK_TLS_INSECURE") == "true", do: :verify_none, else: :verify_peer
 
     Req.new(
       base_url: url,
-      auth: {:basic, "#{username}:#{password}"},
+      auth: {:basic, {username, password}},
       connect_options: [verify: tls_verify]
     )
   end
@@ -141,13 +141,17 @@ defmodule Telecore.Mikrotik.HTTP do
   defp handle_response({:ok, %Req.Response{status: 404}}, _),
     do: {:error, %Error{code: :not_found, message: "not found"}}
 
-  defp handle_response({:ok, %Req.Response{body: %{"detail" => msg}}}, _) when is_binary(msg) do
+  defp handle_response({:ok, %Req.Response{status: s, body: %{"detail" => msg}}}, _)
+       when s in [400, 422] and is_binary(msg) do
     if msg =~ "already have" do
       {:error, %Error{code: :conflict, message: msg}}
     else
       {:error, %Error{code: :unknown, message: msg}}
     end
   end
+
+  defp handle_response({:ok, %Req.Response{body: %{"detail" => msg}}}, _) when is_binary(msg),
+    do: {:error, %Error{code: :unknown, message: msg}}
 
   defp handle_response({:ok, %Req.Response{status: s, body: body}}, _),
     do: {:error, %Error{code: :unknown, message: "HTTP #{s}: #{inspect(body)}"}}
