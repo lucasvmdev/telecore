@@ -14,46 +14,46 @@ defmodule Telecore.Mikrotik.Fake do
   def start_link(_opts \\ []), do: GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
 
   @impl true
-  def list_secrets(%Router{id: id}), do: call({:list, id, :secrets})
+  def list_secrets(%Router{} = r), do: call({:list, r, :secrets})
 
   @impl true
-  def get_secret(%Router{id: id}, name), do: call({:get, id, :secrets, "name", name})
+  def get_secret(%Router{} = r, name), do: call({:get, r, :secrets, "name", name})
 
   @impl true
-  def create_secret(%Router{id: id}, attrs), do: call({:create, id, :secrets, attrs})
+  def create_secret(%Router{} = r, attrs), do: call({:create, r, :secrets, attrs})
 
   @impl true
-  def update_secret(%Router{id: id}, name, attrs),
-    do: call({:update, id, :secrets, "name", name, attrs})
+  def update_secret(%Router{} = r, name, attrs),
+    do: call({:update, r, :secrets, "name", name, attrs})
 
   @impl true
-  def delete_secret(%Router{id: id}, name), do: call({:delete, id, :secrets, "name", name})
+  def delete_secret(%Router{} = r, name), do: call({:delete, r, :secrets, "name", name})
 
   @impl true
-  def enable_secret(%Router{id: id}, name), do: call({:set_disabled, id, name, "false"})
+  def enable_secret(%Router{} = r, name), do: call({:set_disabled, r, name, "false"})
 
   @impl true
-  def disable_secret(%Router{id: id}, name), do: call({:set_disabled, id, name, "true"})
+  def disable_secret(%Router{} = r, name), do: call({:set_disabled, r, name, "true"})
 
   @impl true
-  def list_sessions(%Router{id: id}), do: call({:list, id, :sessions})
+  def list_sessions(%Router{} = r), do: call({:list, r, :sessions})
 
   @impl true
-  def disconnect_session(%Router{id: id}, session_id),
-    do: call({:delete, id, :sessions, ".id", session_id})
+  def disconnect_session(%Router{} = r, session_id),
+    do: call({:delete, r, :sessions, ".id", session_id})
 
   @impl true
-  def list_queues(%Router{id: id}), do: call({:list, id, :queues})
+  def list_queues(%Router{} = r), do: call({:list, r, :queues})
 
   @impl true
-  def create_queue(%Router{id: id}, attrs), do: call({:create, id, :queues, attrs})
+  def create_queue(%Router{} = r, attrs), do: call({:create, r, :queues, attrs})
 
   @impl true
-  def update_queue(%Router{id: id}, name, attrs),
-    do: call({:update, id, :queues, "name", name, attrs})
+  def update_queue(%Router{} = r, name, attrs),
+    do: call({:update, r, :queues, "name", name, attrs})
 
   @impl true
-  def delete_queue(%Router{id: id}, name), do: call({:delete, id, :queues, "name", name})
+  def delete_queue(%Router{} = r, name), do: call({:delete, r, :queues, "name", name})
 
   defp call(msg), do: GenServer.call(__MODULE__, msg)
 
@@ -63,14 +63,14 @@ defmodule Telecore.Mikrotik.Fake do
   def init(_), do: {:ok, %{}}
 
   @impl true
-  def handle_call({:list, router_id, kind}, _from, state) do
-    state = ensure_router(state, router_id)
-    {:reply, {:ok, get_in(state, [router_id, kind])}, state}
+  def handle_call({:list, router, kind}, _from, state) do
+    state = ensure_router(state, router)
+    {:reply, {:ok, get_in(state, [router.id, kind])}, state}
   end
 
-  def handle_call({:get, router_id, kind, key, value}, _from, state) do
-    state = ensure_router(state, router_id)
-    items = get_in(state, [router_id, kind])
+  def handle_call({:get, router, kind, key, value}, _from, state) do
+    state = ensure_router(state, router)
+    items = get_in(state, [router.id, kind])
 
     case Enum.find(items, &(&1[key] == value)) do
       nil -> {:reply, {:error, not_found(value)}, state}
@@ -78,17 +78,17 @@ defmodule Telecore.Mikrotik.Fake do
     end
   end
 
-  def handle_call({:create, router_id, kind, attrs}, _from, state) do
-    state = ensure_router(state, router_id)
-    items = get_in(state, [router_id, kind])
+  def handle_call({:create, router, kind, attrs}, _from, state) do
+    state = ensure_router(state, router)
+    items = get_in(state, [router.id, kind])
     new = Map.put(attrs, ".id", "*#{System.unique_integer([:positive])}")
-    state = put_in(state, [router_id, kind], items ++ [new])
+    state = put_in(state, [router.id, kind], items ++ [new])
     {:reply, {:ok, new}, state}
   end
 
-  def handle_call({:update, router_id, kind, key, value, attrs}, _from, state) do
-    state = ensure_router(state, router_id)
-    items = get_in(state, [router_id, kind])
+  def handle_call({:update, router, kind, key, value, attrs}, _from, state) do
+    state = ensure_router(state, router)
+    items = get_in(state, [router.id, kind])
 
     case Enum.find_index(items, &(&1[key] == value)) do
       nil ->
@@ -97,14 +97,14 @@ defmodule Telecore.Mikrotik.Fake do
       idx ->
         updated = Map.merge(Enum.at(items, idx), attrs)
         items = List.replace_at(items, idx, updated)
-        state = put_in(state, [router_id, kind], items)
+        state = put_in(state, [router.id, kind], items)
         {:reply, {:ok, updated}, state}
     end
   end
 
-  def handle_call({:delete, router_id, kind, key, value}, _from, state) do
-    state = ensure_router(state, router_id)
-    items = get_in(state, [router_id, kind])
+  def handle_call({:delete, router, kind, key, value}, _from, state) do
+    state = ensure_router(state, router)
+    items = get_in(state, [router.id, kind])
 
     case Enum.find_index(items, &(&1[key] == value)) do
       nil ->
@@ -112,14 +112,14 @@ defmodule Telecore.Mikrotik.Fake do
 
       idx ->
         items = List.delete_at(items, idx)
-        state = put_in(state, [router_id, kind], items)
+        state = put_in(state, [router.id, kind], items)
         {:reply, {:ok, :ok}, state}
     end
   end
 
-  def handle_call({:set_disabled, router_id, name, flag}, _from, state) do
-    state = ensure_router(state, router_id)
-    secrets = get_in(state, [router_id, :secrets])
+  def handle_call({:set_disabled, router, name, flag}, _from, state) do
+    state = ensure_router(state, router)
+    secrets = get_in(state, [router.id, :secrets])
 
     case Enum.find_index(secrets, &(&1["name"] == name)) do
       nil ->
@@ -127,14 +127,14 @@ defmodule Telecore.Mikrotik.Fake do
 
       idx ->
         secrets = List.update_at(secrets, idx, &Map.put(&1, "disabled", flag))
-        state = put_in(state, [router_id, :secrets], secrets)
+        state = put_in(state, [router.id, :secrets], secrets)
 
         # Disabling: remove sessão. Enabling: nada.
         state =
           if flag == "true" do
-            sessions = get_in(state, [router_id, :sessions])
+            sessions = get_in(state, [router.id, :sessions])
             sessions = Enum.reject(sessions, &(&1["name"] == name))
-            put_in(state, [router_id, :sessions], sessions)
+            put_in(state, [router.id, :sessions], sessions)
           else
             state
           end
@@ -145,93 +145,129 @@ defmodule Telecore.Mikrotik.Fake do
 
   # --- Helpers ---
 
-  defp ensure_router(state, router_id) do
-    if Map.has_key?(state, router_id) do
+  defp ensure_router(state, %Router{id: id} = router) do
+    if Map.has_key?(state, id) do
       state
     else
-      Map.put(state, router_id, seed(router_id))
+      Map.put(state, id, seed(router))
     end
   end
 
-  # Deterministic per-router variation. Each router gets the same 3 secrets,
-  # but with different disabled flags and active sessions, so the UI shows
-  # visibly different state across routers without manual setup.
-  defp seed(router_id) do
-    disabled_names =
-      case :erlang.phash2(router_id, 4) do
+  # Pool of names used to generate per-router clients. Each router picks a
+  # window from this list deterministically (rotating by router-id hash) so
+  # that no two routers share the same set of clients.
+  @name_pool ~w(joao maria pedro ana carlos fernanda rafael patricia lucas
+                juliana bruno camila ricardo amanda diego sofia thiago
+                isabela leonardo gabriela)
+
+  @profiles [
+    {"10mbps", "10M/10M"},
+    {"25mbps", "25M/25M"},
+    {"50mbps", "50M/50M"},
+    {"100mbps", "100M/100M"},
+    {"200mbps", "200M/200M"}
+  ]
+
+  @uptimes ["2h13m", "47m", "5d 2h", "1d 14h", "3h 22m", "12h", "8d 4h", "21m"]
+
+  # Deterministic per-router seed. Generates 3–5 clients with distinct names
+  # and IPs derived from the router's URL subnet. Some clients are disabled
+  # based on a hash of the router id, so the UI shows different states.
+  defp seed(%Router{id: id, url: url}) do
+    count = 3 + rem(:erlang.phash2(id, 3), 3)
+    offset = rem(:erlang.phash2(id, length(@name_pool)), length(@name_pool))
+
+    names =
+      0..(count - 1)
+      |> Enum.map(fn i -> Enum.at(@name_pool, rem(offset + i, length(@name_pool))) end)
+
+    disabled_idxs =
+      case :erlang.phash2({id, :disabled}, 4) do
         0 -> []
-        1 -> ["joao"]
-        2 -> ["joao", "maria"]
-        3 -> ["pedro"]
+        1 -> [0]
+        2 -> [0, 1]
+        3 -> [count - 1]
       end
 
+    subnet = subnet_from_url(url)
+
     secrets =
-      [
+      names
+      |> Enum.with_index()
+      |> Enum.map(fn {name, i} ->
+        {profile, _} = Enum.at(@profiles, rem(:erlang.phash2({id, name}, length(@profiles)), length(@profiles)))
+
         %{
-          ".id" => "*1",
-          "name" => "joao",
-          "password" => "pwjoao",
-          "profile" => "10mbps",
+          ".id" => "*S#{i + 1}",
+          "name" => name,
+          "password" => "pw_#{name}",
+          "profile" => profile,
           "service" => "pppoe",
-          "comment" => "Cliente residencial"
-        },
-        %{
-          ".id" => "*2",
-          "name" => "maria",
-          "password" => "pwmaria",
-          "profile" => "50mbps",
-          "service" => "pppoe",
-          "comment" => ""
-        },
-        %{
-          ".id" => "*3",
-          "name" => "pedro",
-          "password" => "pwpedro",
-          "profile" => "100mbps",
-          "service" => "pppoe",
-          "comment" => "Empresa"
+          "comment" => comment_for(i),
+          "disabled" => if(i in disabled_idxs, do: "true", else: "false")
         }
-      ]
-      |> Enum.map(fn s ->
-        Map.put(s, "disabled", if(s["name"] in disabled_names, do: "true", else: "false"))
       end)
 
-    all_sessions = [
-      %{
-        ".id" => "*A1",
-        "name" => "joao",
-        "address" => "10.0.0.5",
-        "uptime" => "2h13m",
-        "service" => "pppoe",
-        "caller-id" => "aa:bb:cc:dd:ee:01"
-      },
-      %{
-        ".id" => "*A2",
-        "name" => "maria",
-        "address" => "10.0.0.6",
-        "uptime" => "47m",
-        "service" => "pppoe",
-        "caller-id" => "aa:bb:cc:dd:ee:02"
-      },
-      %{
-        ".id" => "*A3",
-        "name" => "pedro",
-        "address" => "10.0.0.7",
-        "uptime" => "5d 2h",
-        "service" => "pppoe",
-        "caller-id" => "aa:bb:cc:dd:ee:03"
-      }
-    ]
+    sessions =
+      secrets
+      |> Enum.with_index()
+      |> Enum.reject(fn {s, _} -> s["disabled"] == "true" end)
+      |> Enum.map(fn {s, i} ->
+        %{
+          ".id" => "*A#{i + 1}",
+          "name" => s["name"],
+          "address" => "#{subnet}.#{10 + i}",
+          "uptime" => Enum.at(@uptimes, rem(:erlang.phash2({id, s["name"]}, length(@uptimes)), length(@uptimes))),
+          "service" => "pppoe",
+          "caller-id" => mac_for(id, i)
+        }
+      end)
 
-    sessions = Enum.reject(all_sessions, &(&1["name"] in disabled_names))
+    queues =
+      secrets
+      |> Enum.with_index()
+      |> Enum.map(fn {s, i} ->
+        {profile, max_limit} =
+          Enum.find(@profiles, {"10mbps", "10M/10M"}, fn {p, _} -> p == s["profile"] end)
 
-    queues = [
-      %{".id" => "*Q1", "name" => "joao", "target" => "10.0.0.5/32", "max-limit" => "10M/10M"},
-      %{".id" => "*Q2", "name" => "maria", "target" => "10.0.0.6/32", "max-limit" => "50M/50M"},
-      %{".id" => "*Q3", "name" => "pedro", "target" => "10.0.0.7/32", "max-limit" => "100M/100M"}
-    ]
+        _ = profile
+
+        %{
+          ".id" => "*Q#{i + 1}",
+          "name" => s["name"],
+          "target" => "#{subnet}.#{10 + i}/32",
+          "max-limit" => max_limit
+        }
+      end)
 
     %{secrets: secrets, sessions: sessions, queues: queues}
+  end
+
+  # Extract the first three octets of an IPv4 from the URL host.
+  # Falls back to "10.0.0" when the URL has no IP host.
+  defp subnet_from_url(url) when is_binary(url) do
+    case Regex.run(~r/(\d+)\.(\d+)\.(\d+)\.\d+/, url) do
+      [_, a, b, c] -> "#{a}.#{b}.#{c}"
+      _ -> "10.0.0"
+    end
+  end
+
+  defp subnet_from_url(_), do: "10.0.0"
+
+  defp comment_for(0), do: "Cliente residencial"
+  defp comment_for(1), do: ""
+  defp comment_for(2), do: "Empresa"
+  defp comment_for(3), do: "Plano premium"
+  defp comment_for(_), do: "Cliente"
+
+  defp mac_for(id, i) do
+    bytes = :erlang.phash2({id, i}, 0xFFFFFF)
+
+    b1 = bytes |> div(0x10000) |> Integer.to_string(16) |> String.pad_leading(2, "0")
+    b2 = bytes |> div(0x100) |> rem(0x100) |> Integer.to_string(16) |> String.pad_leading(2, "0")
+    b3 = bytes |> rem(0x100) |> Integer.to_string(16) |> String.pad_leading(2, "0")
+
+    "aa:bb:cc:#{b1}:#{b2}:#{b3}"
   end
 
   defp not_found(value), do: %Error{code: :not_found, message: "#{value} not found"}

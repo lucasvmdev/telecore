@@ -51,35 +51,40 @@ defmodule Telecore.Mikrotik.FakeTest do
 
   describe "delete_secret/2" do
     test "removes from state" do
-      assert {:ok, :ok} = Fake.delete_secret(@router, "joao")
+      {:ok, [%{"name" => name} | _]} = Fake.list_secrets(@router)
+      assert {:ok, :ok} = Fake.delete_secret(@router, name)
       {:ok, secrets} = Fake.list_secrets(@router)
-      refute Enum.any?(secrets, &(&1["name"] == "joao"))
+      refute Enum.any?(secrets, &(&1["name"] == name))
     end
 
     test "returns not_found for unknown name" do
-      assert {:error, %Error{code: :not_found}} = Fake.delete_secret(@router, "ghost")
+      assert {:error, %Error{code: :not_found}} = Fake.delete_secret(@router, "ghost-name-xyz")
     end
   end
 
   describe "disable_secret/2" do
     test "sets disabled and removes session" do
-      assert {:ok, :ok} = Fake.disable_secret(@router, "joao")
+      {:ok, [%{"name" => name} | _]} = Fake.list_secrets(@router)
+      assert {:ok, :ok} = Fake.disable_secret(@router, name)
+
       {:ok, secrets} = Fake.list_secrets(@router)
-      joao = Enum.find(secrets, &(&1["name"] == "joao"))
-      assert joao["disabled"] == "true"
+      target = Enum.find(secrets, &(&1["name"] == name))
+      assert target["disabled"] == "true"
 
       {:ok, sessions} = Fake.list_sessions(@router)
-      refute Enum.any?(sessions, &(&1["name"] == "joao"))
+      refute Enum.any?(sessions, &(&1["name"] == name))
     end
   end
 
   describe "enable_secret/2" do
     test "clears disabled flag" do
-      Fake.disable_secret(@router, "joao")
-      assert {:ok, :ok} = Fake.enable_secret(@router, "joao")
+      {:ok, [%{"name" => name} | _]} = Fake.list_secrets(@router)
+      Fake.disable_secret(@router, name)
+      assert {:ok, :ok} = Fake.enable_secret(@router, name)
+
       {:ok, secrets} = Fake.list_secrets(@router)
-      joao = Enum.find(secrets, &(&1["name"] == "joao"))
-      assert joao["disabled"] == "false"
+      target = Enum.find(secrets, &(&1["name"] == name))
+      assert target["disabled"] == "false"
     end
   end
 
