@@ -29,6 +29,11 @@ defmodule TelecoreWeb.CoreComponents do
   use Phoenix.Component
   use Gettext, backend: TelecoreWeb.Gettext
 
+  use Phoenix.VerifiedRoutes,
+    endpoint: TelecoreWeb.Endpoint,
+    router: TelecoreWeb.Router,
+    statics: TelecoreWeb.static_paths()
+
   alias Phoenix.LiveView.JS
 
   @doc """
@@ -489,5 +494,47 @@ defmodule TelecoreWeb.CoreComponents do
   """
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
+  end
+
+  @doc """
+  Sub-navigation for a Router scope. Shows breadcrumb and tabs.
+  """
+  attr :router, :map, required: true
+  attr :active, :atom, required: true, values: [:show, :sessions, :secrets]
+
+  def router_nav(assigns) do
+    ~H"""
+    <div class="space-y-2">
+      <div class="text-sm opacity-60">
+        <.link navigate={~p"/routers"} class="hover:underline">Roteadores</.link>
+        <span class="mx-1">›</span>
+        <span class="font-medium">{@router.label}</span>
+      </div>
+
+      <div role="tablist" class="tabs tabs-bordered">
+        <.link
+          navigate={~p"/routers/#{@router.id}"}
+          role="tab"
+          class={["tab", @active == :show && "tab-active"]}
+        >
+          Visão geral
+        </.link>
+        <.link
+          navigate={~p"/routers/#{@router.id}/sessions"}
+          role="tab"
+          class={["tab", @active == :sessions && "tab-active"]}
+        >
+          Sessões
+        </.link>
+        <.link
+          navigate={~p"/routers/#{@router.id}/secrets"}
+          role="tab"
+          class={["tab", @active == :secrets && "tab-active"]}
+        >
+          Clientes
+        </.link>
+      </div>
+    </div>
+    """
   end
 end
